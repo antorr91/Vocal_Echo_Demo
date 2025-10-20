@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <!-- Standard HTML5 meta tags for character encoding and responsive design -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Page title that appears in browser tab -->
+    <title>Vocal Echo</title>
+
+    <!-- Meta description for search engines and social sharing -->
+    <meta name="description" content="Vocal Echo is a lightweight, low-latency system for automatic detection of chick vocalisations and closed-loop acoustic feedback.">
+
+    <!-- Favicon - the small icon in the browser tab (change filename as needed) -->
+    <link rel="icon" href="Applcon.ico">
+
+    <!-- Google Fonts import for Source Serif typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+      /* CSS CUSTOM PROPERTIES (VARIABLES) - Easy to modify colours and values */
+      :root{
+      --bg:#f3f5f9;         /* Main page background colour */
+      --panel:#ffffff;      /* White panels/cards background */
+      --panel-sub:#f6f7fb;  /* Slightly grey sub-panels (tabs area) */
+      --ink:#122235;        /* Main text colour (dark blue-grey) */
+      --ink-soft:#5a6880;   /* Secondary text colour (lighter) */
+      --brand:#172957;      /* Primary brand colour (navy blue) */
+      --brand-2:#1b2e5d;    /* Brand colour hover state (slightly darker) */
+      --accent:#6aa0ff;     /* Accent colour for focus outlines */
+      --line:#d9deea;       /* Border colour for dividers */
+      --radius:14px;        /* Standard border radius for rounded corners */
+      }
+
+      /* GLOBAL RESET - Ensures consistent box model */
+      *{box-sizing:border-box}
+      html,body{height:100%}
+
+      /* BODY STYLING - Sets up main page appearance */
+      body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:"Source Serif 1", ui-serif, Georgia, "Times New Roman", serif;
+      line-height:1.6; /* Comfortable reading line height */
+      }
+
+      /* BASIC LINK STYLING */
+      a{color:var(--brand)}
+
+      /* MAIN CONTAINER - Centers content and adds padding */
+      .container{
+      max-width:1100px;    /* Maximum width before content stops growing */
+      margin:22px auto;    /* Centers horizontally with top/bottom margin */
+      padding:0 16px       /* Side padding for mobile devices */
+      }
+
+      /* CARD COMPONENT - Main content wrapper with shadow */
+      .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:0 10px 28px rgba(0,0,0,.06); /* Subtle shadow for depth */
+      overflow:hidden /* Ensures child elements don't break rounded corners */
+      }
+
+      /* HEADER SECTION - Sophisticated layered design */
+      header.header-layered {
+      background: var(--panel);
+      padding: 0;
+      position: relative;
+      }
+
+      header.header-layered .top-bar {
+      background: linear-gradient(90deg, var(--brand) 0%, var(--brand-2) 100%);
+      height: 6px;
+      }
+
+      header.header-layered .main-content {
+      padding: 36px 24px;
+      background: var(--panel);
+      position: relative;
+      }
+
+      header.header-layered .header-content {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      }
+
+      header.header-layered .logo-container {
+      position: relative;
+      padding: 12px;
+      background: var(--panel);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(23, 41, 87, 0.12);
+      border: 1px solid rgba(23, 41, 87, 0.08);
+      }
+
+      header.header-layered .logo-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 70%, rgba(106, 160, 255, 0.15) 0%, rgba(23, 41, 87, 0.08) 40%, transparent 70%);
+      border-radius: 16px;
+      }
+
+      /* LOGO STYLING */
+      header.header-layered img{
+      height: 48px;        /* Fixed height, width auto-scales */
+      width: auto;
+      position: relative;
+      z-index: 1;
+      }
+
+      /* MAIN TITLE */
+      header.header-layered h1{
+      margin: 0;
+      font-weight: 800;    /* Extra bold */
+      font-size: clamp(30px, 3.8vw, 40px); /* Responsive font size */
+      color: var(--brand);
+      letter-spacing: -0.4px; /* Tighter letter spacing for sophistication */
+      }
+
+      /* SUBTITLE */
+      header.header-layered .subtitle{
+      margin: 8px 0 0;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      font-style: italic;
+      font-weight: 400;
+      }
+
+      /* NAVIGATION TABS - Container for tab buttons */
+      nav.tabs{
+      display:flex;
+      gap:6px;              /* Space between tab buttons */
+      flex-wrap:wrap;       /* Allows wrapping on small screens */
+      background:var(--panel-sub);
+      border-bottom:1px solid var(--line);
+      padding:10px
+      }
+
+      /* TAB BUTTONS - Individual clickable tabs */
+      .tab-btn{
+      appearance:none;      /* Removes default browser button styling */
+      border:1.5px solid var(--brand);
+      background:#fff;
+      color:var(--ink);
+      padding:10px 14px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700       /* Bold text */
+      }
+
+      /* ACTIVE TAB STATE - Selected tab appearance */
+      .tab-btn[aria-selected="true"]{
+      background:var(--brand);
+      color:#fff            /* White text on brand background */
+      }
+
+      /* TAB PANELS - Content sections (initially hidden) */
+      section[role="tabpanel"]{
+      display:none;         /* Hidden by default */
+      padding:20px
+      }
+
+      /* ACTIVE TAB PANEL - Shows current section with fade animation */
+      section[role="tabpanel"][data-active="true"]{
+      display:block;
+      animation:fade .28s ease-in /* Smooth fade-in effect */
+      }
+
+      /* FADE ANIMATION - Creates smooth transitions between tabs */
+      @keyframes fade{
+      from{opacity:0; transform:translateY(6px)} /* Starts slightly down and transparent */
+      to{opacity:1; transform:none}              /* Ends fully visible in position */
+      }
+
+      /* MAIN HEADINGS */
+      h2{
+      color:var(--brand);
+      font-size:clamp(20px,2.2vw,26px);
+      border-bottom:2px solid var(--brand); /* Underline accent */
+      padding-bottom:8px;
+      margin:6px 0 16px
+      }
+
+      /* SUB HEADINGS */
+      h3{
+      color:var(--brand-2);
+      margin:18px 0 8px
+      }
+
+      /* CONTENT BOXES - Various styled containers */
+      .abstract,.feature,.audio-wrap,.cluster,.diagram,.code,.note-box{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:16px
+      }
+
+      /* GRID LAYOUT - Responsive grid for features */
+      .grid{
+      display:grid;
+      gap:16px;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr)) /* Responsive columns */
+      }
+
+      /* FEATURE BOXES - Special styling with brand accent */
+      .feature{
+      border-left:4px solid var(--brand) /* Left accent border */
+      }
+
+      /* BUTTONS AND CALL-TO-ACTION LINKS */
+      .btn,.cta{
+      display:inline-block;
+      padding:10px 14px;
+      background:var(--brand);
+      color:#fff;
+      text-decoration:none;
+      border-radius:10px;
+      font-weight:700
+      }
+
+      /* BUTTON HOVER EFFECTS */
+      .btn:hover,.cta:hover{
+      background:var(--brand-2) /* Darker shade on hover */
+      }
+
+      /* SECONDARY TEXT STYLING */
+      .note{color:var(--ink-soft)}
+
+      /* CODE BLOCKS - Terminal/code appearance */
+      .code{
+      background:#0f172a;   /* Dark background */
+      color:#e2e8f0;       /* Light text */
+      border-radius:12px;
+      padding:14px;
+      overflow:auto;       /* Horizontal scroll if needed */
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; /* Monospace font */
+      font-size:.95rem
+      }
+
+      /* INTERFACE MOCKUPS - Styling for screenshots/demos */
+      .screen{
+      background:#eef2f7;
+      border:1px dashed #b9c5da; /* Dashed border suggests placeholder */
+      border-radius:12px;
+      padding:12px;
+      text-align:center
+      }
+
+      /* IMAGES WITHIN SCREENS */
+      .screen img{
+      max-width:100%;
+      height:auto;
+      max-height:420px;
+      object-fit:contain; /* Maintains aspect ratio */
+      border-radius:10px
+      }
+
+      /* TWO COLUMN LAYOUT - For interface section */
+      .two-col{
+      display:grid;
+      grid-template-columns:0.9fr 1.1fr; /* Slightly uneven columns */
+      gap:16px
+      }
+
+      /* RESPONSIVE BREAKPOINT - Stacks columns on smaller screens */
+      @media (max-width:900px){
+      .two-col{grid-template-columns:1fr} /* Single column on mobile */
+      }
+
+      /* KEYBOARD KEY STYLING - For shortcut displays */
+      .kbd{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      background:#eef2f7;
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:2px 6px
+      }
+
+      /* TIGHT LIST SPACING */
+      ul.tight>li{margin:4px 0}
+
+      /* VIDEO CONTAINER - Centers video content */
+      .video-wrap{
+      display:flex;
+      justify-content:center
+      }
+
+      /* VIDEO ELEMENT STYLING */
+      .video{
+      width:100%;
+      max-width:920px;
+      aspect-ratio:16/9;   /* Maintains video aspect ratio */
+      background:#000;     /* Black background while loading */
+      border:1px solid var(--line);
+      border-radius:12px
+      }
+
+      /* FOOTER STYLING */
+      footer{
+      background:#f0f3fa;
+      color:#4a5a6a;
+      text-align:center;
+      padding:20px
+      }
+
+      /* Footer links container */
+      .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      align-items: center;
+      }
+
+      /* Individual footer link styling */
+      .footer-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--brand);
+      text-decoration: none;
+      transition: transform 0.2s ease;
+      }
+
+      .footer-link:hover {
+      transform: translateY(-2px);
+      }
+
+      /* Icon styling */
+      .footer-icon {
+      width: 24px;
+      height: 24px;
+      fill: var(--brand);
+      }
+
+      /* Text under icons */
+      .footer-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+      }
+
+      /* Mobile responsive */
+      @media (max-width: 500px) {
+      .footer-links {
+      flex-direction: column;
+      gap: 24px;
+      }
+      }
+
+      /* ACCESSIBILITY - Focus outline for keyboard navigation */
+      :focus-visible{
+      outline:3px solid var(--accent);
+      outline-offset:2px;
+      border-radius:8px
+      }
+
+      /* SCREEN READER ONLY TEXT - Hidden but accessible */
+      .sr-only{
+      position:absolute;
+      left:-10000px;
+      top:auto;
+      width:1px;
+      height:1px;
+      overflow:hidden
+      }
+    </style>
+  </head>
+  <body>
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+      <!-- MAIN CARD WRAPPER -->
+      <div class="card" role="region" aria-label="Vocal Echo">
+
+        <!-- HEADER SECTION - Sophisticated layered design with bottom border -->
+        <header class="header-layered">
+          <!-- Top colored bar - creates elegant gradient accent -->
+          <div class="top-bar"></div>
+
+          <!-- Main content area -->
+          <div class="main-content">
+            <div class="header-content">
+              <!-- LOGO CONTAINER - Elevated design with shadow and gradient background -->
+              <div class="logo-container">
+                <!-- LOGO IMAGE - Change src to your logo file -->
+                <img src="vocal_echo_logo.png" alt="Vocal Echo logo">
+              </div>
+
+              <!-- TEXT CONTENT - Title and subtitle -->
+              <div class="title-wrap">
+                <!-- MAIN TITLE - Edit text here -->
+                <h1>Vocal Echo</h1>
+                <!-- SUBTITLE - Edit description here -->
+                <p class="subtitle"> A closed-loop system for real-time vocal analysis of domestic chicks.</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- NAVIGATION TABS - Add/remove tabs by copying button structure -->
+        <nav class="tabs" role="tablist" aria-label="Sections">
+          <button class="tab-btn" role="tab" aria-selected="true" aria-controls="tab-overview" id="tab-btn-overview">Overview</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-quickstart" id="tab-btn-quickstart">Quick start</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-architecture" id="tab-btn-architecture">Architecture</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-interface" id="tab-btn-interface">Interface</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-live" id="tab-btn-live">Live Demo</button>
+        </nav>
+
+        <!-- TAB CONTENT SECTIONS - Each section corresponds to a tab -->
+
+        <!-- OVERVIEW TAB - First tab, shown by default -->
+        <section id="tab-overview" role="tabpanel" aria-labelledby="tab-btn-overview" data-active="true">
+          <h2>What is Vocal Echo?</h2>
+          <p>Animal vocalisations are a fundamental way to assess psychophysical states and how environmental conditions influence behavioural responses in early stages of life. Newly hatched chicks (Gallus gallus), as precocial, are a unique model for studying how early vocal interactions affect animal internal states. Understanding these effects requires real-time assessment of calls and precise temporal control of acoustic feedback, challenges that have limited our ability to study vocal interactions in isolated young animals. Here we present Vocal Echo, a closed-loop system that automatically detects vocalisations and provides contingent acoustic feedback, allowing real-time interactions with the chicks. Vocal Echo represents a methodological advance in studying vocal interactions, offering researchers the ability to examine how specific acoustic experiences can influence internal animal states and paves the way for real time investigation of the neural mechanisms underlying vocal communication.</p>
+          <ul>
+            <li><strong> Calls Detection</strong>: Based on signal processing algorithms, and faster than deep learning methods .</li>
+            <li><strong>Feedback</strong>: plays context-specific calls/white-noise/silence within a fixed latency budget.</li>
+            <li><strong>I/O</strong>: GUI controls, OSC endpoints.</li>
+          </ul>
+          <!-- CTA BUTTON - Links to another tab -->
+          <a class="cta" href="#tab-quickstart" onclick="activate('tab-quickstart')">Get started</a>
+        </section>
+
+        <!-- QUICK START TAB -->
+<section id="tab-quickstart" role="tabpanel" aria-labelledby="tab-btn-quickstart">
+  <h2>Quick start</h2>
+  <!-- STEP-BY-STEP INSTRUCTIONS -->
+  <ol>
+    <li><strong>Install prerequisites</strong>: 
+      <ul class="tight">
+        <li>Windows 10/11 (64-bit)</li>
+        <li>Visual Studio 2022 with <em>Desktop development with C++</em></li>
+        <li><a href="https://juce.com" target="_blank">JUCE 8</a> (includes Projucer)</li>
+      </ul>
+    </li>
+    <li><strong>Create a new JUCE project</strong>:
+      <ul class="tight">
+        <li>Open <em>Projucer</em> → <em>New Project</em> → select <strong>GUI Application</strong> (⚠ not Audio Plug-In).</li>
+        <li>Set project name <code>VocalEcho</code> and choose <em>Visual Studio 2022</em> as exporter.</li>
+      </ul>
+    </li>
+    <li><strong>Select modules</strong> : 
+      <ul class="tight">
+        <li>juce_audio_basics, juce_audio_devices, juce_audio_formats, juce_audio_utils</li>
+        <li>juce_core, juce_data_structures, juce_dsp, juce_events, juce_graphics, juce_gui_basics, juce_osc</li>
+      </ul>
+      <p class="note">Do not include <code>juce_audio_plugin_client</code>, <code>juce_product_unlocking</code>, <code>juce_cryptography</code>, <code>juce_video</code> unless required — they are not needed here.</p>
+    </li>
+    <li><strong>Add source files</strong>:
+      <ul class="tight">
+        <li>Download the project files from <a href="https://github.com/antorr91/Vocal_Echo" target="_blank">GitHub</a>.</li>
+        <li>Copy <code>MainComponent.cpp</code> and <code>MainComponent.h</code> into the project’s <code>Source/</code> folder.</li>
+        <li>In <code>Main.cpp</code> (generated by Projucer) include your component:<br>
+          <code>#include "MainComponent.h"</code> and set it as the main window content.</li>
+      </ul>
+    </li>
+    <li><strong>Build</strong>:
+      <ul class="tight">
+        <li>Save in Projucer → “Save Project and Open in IDE”.</li>
+        <li>In Visual Studio, select configuration <em>Release | x64</em> and build.</li>
+        <li>The executable will appear under <code>Builds/VisualStudio2022/x64/Release/</code>.</li>
+      </ul>
+    </li>
+    <li><strong>Prepare stimuli</strong>:
+      <ul class="tight">
+        <li>Create a folder <code>calls_fv/</code> with subfolders: <em>pleasure_condition</em>, <em>contact_condition</em>, <em>cluck_condition</em>.</li>
+        <li>Add files <code>pleasure_A/B/C.wav</code>, <code>contact_A/B/C.wav</code>, <code>cluck_A/B/C.wav</code>.</li>
+        <li>Each folder must also include <code>white_A/B/C.wav</code> and <code>silence_A/B/C.wav</code>.</li>
+        <li>Place <code>beep.wav</code> in the root of <code>calls_fv/</code>.</li>
+      </ul>
+    </li>
+    <li><strong>Run</strong>: launch the <code>VocalEcho.exe</code>. Use the GUI buttons or send OSC messages on UDP port 9001 (e.g. <code>/chick/trigger</code>).</li>
+  </ol>
+
+  <!-- PYTHON CODE EXAMPLE -->
+  <h3>Python snippet (OSC control)</h3>
+  <div class="code">
+from pythonosc.udp_client import SimpleUDPClient
+c = SimpleUDPClient("127.0.0.1", 9001)
+c.send_message("/chick/trigger", 1) # 0=silence, 1=biological, 2=white
+  </div>
+  <p class="note">Source files are available on <a href="https://github.com/antorr91/Vocal_Echo" target="_blank">GitHub</a>. Download and place them in your project’s <code>Source/</code> directory before building.</p>
+</section>
+
+        <!-- ARCHITECTURE TAB -->
+        <section id="tab-architecture" role="tabpanel" aria-labelledby="tab-btn-architecture">
+          <h2>Architecture</h2>
+          <div class="grid">
+            <div class="feature">
+              <h3>Signal processing (current)</h3>
+              <ul>
+                <li><strong>Onset detection:</strong> High-Frequency Content (HFC) over a filtered spectrogram with peak picking; global time-shift compensation; refractory logic to avoid double counts.</li>
+                <li><strong>Offset detection:</strong> First-order difference on a mel spectrogram within an expected duration window (min/max), picking the steepest negative slope as call.</li>
+                <li><strong>Streaming:</strong> Circular audio buffer (real-time mic input), ~10&nbsp;ms hops for low latency.</li>
+                <li><strong>OSC link:</strong> Every detected onset/offset is mirrored via <code>/chick/state</code>; stimulus triggers are sent via <code>/chick/trigger</code> to the JUCE app.</li>
+              </ul>
+            </div>
+            <div class="feature">
+              <h3>Feature extraction</h3>
+              <ul>
+                <li><strong>Temporal features:</strong> Call duration, Attack time ( envelope derived).</li>
+                <li><strong>Spectral & energy features:</strong> Spectral centroid (mean/std), RMS (mean/std).</li>
+                <li><strong>Envelope features:</strong> Attack magnitude, Slope (from analytic envelope).</li>
+                <li><strong>Pitch-related features:</strong> YIN <em>F<sub>0</sub></em> statistics (mean/std/skew/kurtosis, bandwidth), first-order diff mean, slope; harmonic magnitudes (F1, F2) and ratios (F1/F0, F2/F0).</li>
+              </ul>
+            </div>
+            <div class="feature">
+              <h3>Planned (not implemented yet)</h3>
+              <ul>
+                <li><strong>Classifier (Soon available):</strong> Label calls (e.g., contact / pleasure / cluck) using a lightweight model.</li>
+                <li><strong>Policy module:</strong> Map labels/context to specific feedback strategies.</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>Latency focus</h3>
+          <ul>
+            <li>Short frame hops for rapid onset detection; offset estimation bounded by expected durations.</li>
+            <li>Playback in the standalone JUCE app is pre-buffered; triggers are delivered via OSC.</li>
+          </ul>
+        </section>
+
+        <!-- INTERFACE TAB -->
+        <section id="tab-interface" role="tabpanel" aria-labelledby="tab-btn-interface">
+          <h2>Interface</h2>
+          <!-- TWO-COLUMN LAYOUT: Controls description + screenshot -->
+          <div class="two-col">
+            <div>
+              <!-- INTERFACE DOCUMENTATION -->
+              <h3>Main controls</h3>
+              <ul class="tight">
+                <li><strong>Output mode</strong> — <em>Mono / Stereo</em>. In stereo, balance is enabled for L/R weighting.</li>
+                <li><strong>Start</strong> — initialises session, plays <span class="kbd"> a beep.wav</span>, opens log; press again to stop and save.</li>
+                <li><strong>Biological conditions</strong> — selects <em>Pleasure / Contact / Cluck</em> for biological playback.</li>
+                <li><strong>Biological call</strong> — plays an A–B–C sequence from the selected family (randomised order), with configured delay and repetitions.</li>
+                <li><strong>White noise</strong> — control stimulus; uses the same delay/repetition parameters.</li>
+                <li><strong>Silence</strong> — silent control (logs the event, no audio).</li>
+              </ul>
+
+              <h3>Sliders</h3>
+              <ul class="tight">
+                <li><strong>Volume</strong> — linear gain applied to playback buffers.</li>
+                <li><strong>Delay (ms)</strong> — inter-stimulus interval within the A–B–C sequence (10–2000 ms).</li>
+                <li><strong>Repetitions</strong> — number of times the A–B–C sequence is repeated (1–5).</li>
+                <li><strong>Balance</strong> — L/R pan when <em>Stereo</em> is active; 0 centred.</li>
+              </ul>
+
+              <h3>Remote control (OSC)</h3>
+              <ul class="tight">
+                <li><span class="kbd">/vocal-echo/enable</span> <em>0/1</em> — start/stop detection & logging.</li>
+                <li><span class="kbd">/vocal-echo/feedback</span> <em>0/1/2</em> — silence / biological / white-noise.</li>
+                <li><span class="kbd">/vocal-echo/state</span> — telemetry with onset timestamps (read-only).</li>
+              </ul>
+            </div>
+
+            <!-- SCREENSHOT PLACEHOLDER -->
+            <div class="screen">
+              <!-- CHANGE THIS IMAGE SRC TO YOUR ACTUAL SCREENSHOT -->
+              <img src="Vocal_echo_interface.jpg" alt="Screenshot of the desktop interface">
+            </div>
+          </div>
+        </section>
+
+        <!-- LIVE DEMO TAB -->
+        <section id="tab-live" role="tabpanel" aria-labelledby="tab-btn-live">
+          <h2>Live Demo</h2>
+          <p class="note">Short demo of Vocal Echo running in real time.</p>
+
+          <!-- VIDEO CONTAINER -->
+          <div class="video-wrap">
+            <!-- CHANGE VIDEO SRC TO YOUR ACTUAL VIDEO FILE -->
+            <video class="video" controls preload="metadata" playsinline>
+              <source src="Vochal_echo_usage.mp4" type="video/mp4">
+              Your browser does not support HTML5 video. You can <a href="Vochal_echo_usage.mp4">download the MP4</a> instead.
+            </video>
+          </div>
+        </section>
+
+        <!-- BENCHMARKS TAB -->
+
+        <!-- ETHICS TAB -->
+
+        <!-- FAQ TAB -->
+
+        <!-- FOOTER -->
+        <footer>
+          <div class="footer-links">
+            <!-- EMAIL LINK -->
+            <a href="mailto:a.m.c.torrisi@qmul.ac.uk" class="footer-link">
+              <svg class="footer-icon" viewBox="0 0 24 24">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                <span class="footer-text">a.m.c.torrisi@qmul.ac.uk</span>
+              </a>
+
+              <!-- GITHUB LINK -->
+              <a href="https://github.com/antorr91/Vocal_Echo" target="_blank" rel="noopener noreferrer" class="footer-link">
+                <svg class="footer-icon" viewBox="0 0 24 24">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s 2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                  <span class="footer-text">antorr91</span>
+                </a>
+              </div>
+            </footer>
+          </div>
+        </div>
+
+        <script>
+          // JAVASCRIPT FOR TAB FUNCTIONALITY
+
+          // Get all tab buttons and panels
+          const tabs = document.querySelectorAll('.tab-btn');
+          const panels = document.querySelectorAll('[role="tabpanel"]');
+
+          // Function to activate a specific tab
+          function activate(id){
+          // Hide all panels, show only the selected one
+          panels.forEach(p=>p.dataset.active = (p.id===id));
+
+          // Update tab button states (visual and accessibility)
+          tabs.forEach(t=>t.setAttribute('aria-selected', String(t.getAttribute('aria-controls')===id)));
+
+          // Update URL hash for bookmarking/sharing
+          history.replaceState(null,'','#'+id);
+          }
+
+          // Add click handlers to all tab buttons
+          tabs.forEach(btn=>btn.addEventListener('click',()=>activate(btn.getAttribute('aria-controls'))));
+
+          // Handle deep linking (when someone visits with #tab-name in URL)
+          const hash = location.hash?.slice(1);
+          if(hash && document.getElementById(hash)) activate(hash);
+
+          // Insert current date automatically
+          const el=document.getElementById('today');
+          if(el){
+          el.textContent = new Date().toLocaleDateString('en-GB',{
+          year:'numeric',
+          month:'long',
+          day:'numeric'
+          });
+          }
+        </script>
+      </body>
+    </html>
